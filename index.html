@@ -1,0 +1,69 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NECROFORGE</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <main id="gameWrap">
+    <canvas id="game"></canvas>
+    <div id="hud">
+      <h1>NECROFORGE</h1>
+      <div id="hpMeter" class="hpMeter">
+        <div id="hpFill"></div>
+        <span id="hpText">HP 100/100</span>
+      </div>
+      <div class="hudRow">
+        <span id="hp">HP</span><span id="atk">ATK</span><span id="def">DEF</span><span id="spd">SPD</span>
+      </div>
+      <div class="hudRow">
+        <span id="wave">OLEADA</span><span id="room">SALA</span><span id="combo">COMBO</span><span id="boss">JEFE</span>
+      </div>
+      <div id="msg">A/D moverse, W saltar, S caer, ESPACIO disparar, I inventario, E recoger.</div>
+    </div>
+    <section id="inventory" aria-label="Inventario">
+      <div>
+        <h2>Inventario</h2>
+        <div id="partList" class="partList"></div>
+      </div>
+      <div>
+        <h3>Ranuras corporales</h3>
+        <div id="slotList" class="slots"></div>
+        <div id="mstHint" class="hint">La sugerencia de build optima espera piezas recolectadas.</div>
+      </div>
+    </section>
+    <div id="death"><div class="endBox"><h2>LA FORJA SE APAGO</h2><p id="deathStats"></p><p>Presiona R para reiniciar.</p></div></div>
+    <div id="bossChoice" class="choiceOverlay">
+      <div class="endBox">
+        <h2>EL REY CAYO</h2>
+        <p id="choiceStats">Puedes robarle una reliquia absurda y rehacer los niveles con tu equipo, o salir con la victoria.</p>
+        <div class="choiceButtons">
+          <button id="stealRelic">1 Robar reliquia rota</button>
+          <button id="leaveForge">2 Salir</button>
+        </div>
+      </div>
+    </div>
+    <div id="win"><div class="endBox"><h2>SALISTE DE LA FORJA</h2><p id="winStats"></p><p>Presiona R para reiniciar.</p></div></div>
+  </main>
+  <aside id="graphPanel">
+    <section class="section">
+      <h2>Grafo de Build</h2>
+      <canvas id="buildCanvas"></canvas>
+      <pre id="adjList"></pre>
+    </section>
+    <section class="section">
+      <h2>Grafo de Progresion</h2>
+      <canvas id="mapCanvas"></canvas>
+      <pre id="distTable"></pre>
+    </section>
+    <section class="section">
+      <h2>Registro de Algoritmos</h2>
+      <div id="log"></div>
+    </section>
+  </aside>
+  <script src="src/game.js"></script>
+</body>
+</html>
+

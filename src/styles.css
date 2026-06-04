@@ -1,0 +1,392 @@
+:root {
+  --void: #0a0a0f;
+  --purple: #1a0a2e;
+  --red: #8b0000;
+  --green: #00ff88;
+  --bone: #e8e0d0;
+  --gold: #ffd700;
+  --cyan: #3cf7ff;
+  --gray: #6d6680;
+  --panel: #08070c;
+  --ember: #ff5a23;
+  --ink: #040407;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(139, 0, 0, .18), transparent 20%),
+    radial-gradient(circle at 78% 82%, rgba(0, 255, 136, .09), transparent 18%),
+    var(--void);
+  color: var(--bone);
+  font-family: "Courier New", monospace;
+  image-rendering: pixelated;
+  letter-spacing: 0;
+}
+
+body {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(340px, 3fr);
+}
+
+#gameWrap {
+  position: relative;
+  min-width: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(0deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 32px 32px,
+    radial-gradient(circle at 48% 35%, #261045 0, #100819 48%, #050508 100%);
+  border-right: 2px solid #4c315f;
+  box-shadow: inset -24px 0 54px rgba(0, 0, 0, .45);
+}
+
+#gameWrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(255, 215, 0, .07), transparent 90px),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, .48) 100%);
+  mix-blend-mode: screen;
+}
+
+canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+#game {
+  width: 100%;
+  height: 100%;
+}
+
+#hud {
+  position: absolute;
+  inset: 12px auto auto 12px;
+  width: min(360px, calc(100% - 24px));
+  min-width: 0;
+  padding: 12px 14px;
+  color: var(--bone);
+  text-shadow: 2px 2px #000;
+  background: linear-gradient(180deg, rgba(20, 10, 35, .88), rgba(5, 5, 8, .82));
+  border: 2px solid #765a88;
+  box-shadow: 0 0 0 2px #050508 inset, 0 10px 32px rgba(0, 0, 0, .45), 0 0 18px rgba(0, 255, 136, .08);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#hud h1 {
+  margin: 0 0 8px;
+  color: var(--gold);
+  font-size: 25px;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(255, 215, 0, .45), 3px 3px #000;
+}
+
+.hpMeter {
+  position: relative;
+  height: 16px;
+  margin: 0 0 8px;
+  border: 2px solid #2a182f;
+  background: #08070c;
+  box-shadow: inset 0 0 0 2px #000;
+  overflow: hidden;
+}
+
+#hpFill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #8b0000, #00ff88);
+  transition: width .12s linear;
+}
+
+#hpText {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--bone);
+  font-size: 11px;
+  line-height: 1;
+  text-shadow: 2px 2px #000;
+}
+
+.hudRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  font-size: 11px;
+}
+
+.hudRow + .hudRow { margin-top: 6px; }
+
+.hudRow span {
+  white-space: nowrap;
+  color: var(--green);
+  background: rgba(0, 0, 0, .28);
+  border-left: 2px solid rgba(0, 255, 136, .35);
+  padding: 3px 5px;
+}
+
+#msg {
+  margin-top: 8px;
+  color: #f2d7d7;
+  font-size: 12px;
+  line-height: 1.25;
+  border-top: 1px solid rgba(232, 224, 208, .16);
+  padding-top: 7px;
+}
+
+#inventory {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(780px, calc(100% - 40px));
+  max-height: min(720px, calc(100% - 40px));
+  transform: translate(-50%, -50%);
+  display: none;
+  grid-template-columns: 1fr 270px;
+  gap: 12px;
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(26, 10, 46, .98), rgba(6, 5, 10, .98)),
+    repeating-linear-gradient(0deg, transparent 0 10px, rgba(255, 255, 255, .02) 10px 12px);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 4px #000 inset, 0 18px 70px rgba(0, 0, 0, .72), 0 0 36px rgba(255, 215, 0, .12);
+  z-index: 4;
+}
+
+#inventory.open { display: grid; }
+
+#inventory h2,
+#inventory h3 {
+  margin: 0 0 10px;
+  color: var(--gold);
+  font-size: 18px;
+  text-shadow: 2px 2px #000;
+}
+
+.partList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  gap: 8px;
+  max-height: 450px;
+  overflow: auto;
+  padding-right: 3px;
+}
+
+.part {
+  min-height: 78px;
+  padding: 8px;
+  border: 2px solid #51405d;
+  background: linear-gradient(180deg, #1a0a2e, #0b0711);
+  color: var(--bone);
+  cursor: grab;
+  user-select: none;
+  font-size: 12px;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .45);
+}
+
+.part:hover {
+  border-color: var(--green);
+  color: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .45), 0 0 14px rgba(0, 255, 136, .2);
+}
+
+.part strong {
+  color: var(--green);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.part small {
+  color: #bfb0c8;
+  display: block;
+  line-height: 1.25;
+}
+
+.slots {
+  display: grid;
+  gap: 8px;
+}
+
+.slot {
+  min-height: 54px;
+  border: 2px dashed #695d78;
+  padding: 7px;
+  font-size: 12px;
+  background: linear-gradient(180deg, #0d0815, #050407);
+}
+
+.slot.filled {
+  border-style: solid;
+  border-color: var(--green);
+  background: linear-gradient(180deg, #092016, #04100b);
+  box-shadow: 0 0 12px rgba(0, 255, 136, .13);
+}
+
+.hint {
+  margin-top: 12px;
+  padding: 8px;
+  border: 2px solid #4b3c25;
+  color: var(--gold);
+  background: linear-gradient(180deg, #1a1307, #0c0803);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#death,
+#win,
+.choiceOverlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, .84);
+  z-index: 5;
+  text-align: center;
+}
+
+#death.show,
+#win.show,
+.choiceOverlay.show { display: grid; }
+
+.endBox {
+  width: min(600px, 96%);
+  padding: 20px;
+  border: 2px solid var(--bone);
+  background: linear-gradient(180deg, #13091f, #050407);
+  box-shadow: 0 0 0 5px #000 inset, 0 0 38px rgba(139, 0, 0, .28);
+}
+
+.endBox h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  color: var(--red);
+}
+
+#win .endBox h2 { color: var(--gold); }
+
+.choiceButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.choiceButtons button {
+  min-height: 46px;
+  border: 2px solid var(--gold);
+  background: linear-gradient(180deg, #271334, #08070c);
+  color: var(--bone);
+  font: 700 12px "Courier New", monospace;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 2px #000;
+}
+
+.choiceButtons button:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.endBox p {
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+#graphPanel {
+  min-width: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .035), transparent 12px),
+    var(--panel);
+  color: var(--bone);
+  box-shadow: inset 12px 0 26px rgba(0, 0, 0, .5);
+}
+
+.section {
+  min-height: 0;
+  border-bottom: 2px solid #2f2240;
+  padding: 10px;
+  display: grid;
+  grid-template-rows: auto minmax(116px, 1fr) auto;
+  gap: 7px;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gold);
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(255, 215, 0, .22);
+}
+
+.section canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 116px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 18px 18px,
+    linear-gradient(0deg, rgba(255, 255, 255, .02) 1px, transparent 1px) 0 0 / 18px 18px,
+    #040405;
+  border: 1px solid #40314b;
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, .55);
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 86px;
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+#log {
+  overflow: auto;
+  background: #030403;
+  border: 1px solid #25512f;
+  padding: 8px;
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.35;
+  min-height: 0;
+  grid-row: 2 / 4;
+  box-shadow: inset 0 0 22px rgba(0, 255, 136, .08);
+}
+
+#log div { margin-bottom: 3px; }
+
+@media (max-width: 960px) {
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 62vh 38vh;
+  }
+
+  #graphPanel {
+    height: 38vh;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr;
+  }
+
+  .section {
+    border-bottom: 0;
+    border-right: 2px solid #22172e;
+  }
+
+  #inventory {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+}
