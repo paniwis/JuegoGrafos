@@ -14,11 +14,11 @@ css = css_path.read_text(encoding="utf-8-sig")
 js = js_path.read_text(encoding="utf-8-sig")
 
 html = html.replace(
-    '<link rel="stylesheet" href="src/styles.css">',
+    '<link rel="stylesheet" href="src/styles.css?v=15">',
     f"<style>\n{css}\n  </style>",
 )
 html = html.replace(
-    '<script src="src/game.js"></script>',
+    '<script src="src/game.js?v=15"></script>',
     f"<script>\n{js}\n  </script>",
 )
 

@@ -32,7 +32,7 @@ body {
     radial-gradient(circle at 78% 82%, rgba(0, 255, 136, .09), transparent 18%),
     var(--void);
   color: var(--bone);
-  font-family: "Courier New", monospace;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   image-rendering: pixelated;
   letter-spacing: 0;
 }
@@ -66,12 +66,12 @@ body {
 
 canvas {
   display: block;
-  image-rendering: pixelated;
 }
 
 #game {
   width: 100%;
   height: 100%;
+  image-rendering: pixelated;
 }
 
 #hud {
@@ -149,6 +149,28 @@ canvas {
   line-height: 1.25;
   border-top: 1px solid rgba(232, 224, 208, .16);
   padding-top: 7px;
+}
+
+#pauseBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 84px;
+  height: 34px;
+  border: 2px solid var(--gold);
+  background: linear-gradient(180deg, rgba(39, 19, 52, .94), rgba(8, 7, 12, .94));
+  color: var(--bone);
+  font: 700 12px "Segoe UI", Tahoma, Arial, sans-serif;
+  text-shadow: 2px 2px #000;
+  box-shadow: 0 0 0 2px #000 inset, 0 8px 22px rgba(0, 0, 0, .36);
+  cursor: pointer;
+  z-index: 6;
+}
+
+#pauseBtn:hover,
+#pauseBtn[aria-pressed="true"] {
+  color: var(--green);
+  border-color: var(--green);
 }
 
 #inventory {
@@ -251,6 +273,7 @@ canvas {
 
 #death,
 #win,
+#pauseOverlay,
 .choiceOverlay {
   position: absolute;
   inset: 0;
@@ -264,6 +287,7 @@ canvas {
 
 #death.show,
 #win.show,
+#pauseOverlay.show,
 .choiceOverlay.show { display: grid; }
 
 .endBox {
@@ -294,7 +318,7 @@ canvas {
   border: 2px solid var(--gold);
   background: linear-gradient(180deg, #271334, #08070c);
   color: var(--bone);
-  font: 700 12px "Courier New", monospace;
+  font: 700 12px "Segoe UI", Tahoma, Arial, sans-serif;
   cursor: pointer;
   box-shadow: inset 0 0 0 2px #000;
 }
@@ -313,7 +337,7 @@ canvas {
   min-width: 0;
   height: 100vh;
   display: grid;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 1.7fr .9fr .75fr;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, .035), transparent 12px),
     var(--panel);
@@ -326,22 +350,32 @@ canvas {
   border-bottom: 2px solid #2f2240;
   padding: 10px;
   display: grid;
-  grid-template-rows: auto minmax(116px, 1fr) auto;
+  grid-template-rows: auto minmax(230px, 1fr) auto;
   gap: 7px;
+}
+
+#buildSection {
+  grid-template-rows: auto minmax(300px, 1fr);
+}
+
+#buildSection #adjList {
+  display: none;
 }
 
 .section h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gold);
   text-transform: uppercase;
   text-shadow: 0 0 8px rgba(255, 215, 0, .22);
+  font-weight: 800;
 }
 
 .section canvas {
   width: 100%;
   height: 100%;
-  min-height: 116px;
+  min-height: 230px;
+  image-rendering: auto;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 18px 18px,
     linear-gradient(0deg, rgba(255, 255, 255, .02) 1px, transparent 1px) 0 0 / 18px 18px,
@@ -354,10 +388,11 @@ pre {
   margin: 0;
   white-space: pre-wrap;
   overflow: auto;
-  max-height: 86px;
+  max-height: 118px;
   color: var(--green);
-  font-size: 11px;
-  line-height: 1.25;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
 }
 
 #log {
@@ -366,7 +401,8 @@ pre {
   border: 1px solid #25512f;
   padding: 8px;
   color: var(--green);
-  font-size: 11px;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 12px;
   line-height: 1.35;
   min-height: 0;
   grid-row: 2 / 4;
@@ -415,7 +451,14 @@ pre {
       <div class="hudRow">
         <span id="wave">OLEADA</span><span id="room">SALA</span><span id="combo">COMBO</span><span id="boss">JEFE</span>
       </div>
-      <div id="msg">A/D moverse, W saltar, S caer, ESPACIO disparar, I inventario, E recoger.</div>
+      <div id="msg">A/D moverse, W saltar, S caer, ESPACIO disparar, I inventario, E recoger, P pausar.</div>
+    </div>
+    <button id="pauseBtn" type="button" aria-pressed="false">PAUSA</button>
+    <div id="pauseOverlay">
+      <div class="endBox">
+        <h2>PAUSA</h2>
+        <p>La simulacion esta detenida. Presiona P o el boton para continuar.</p>
+      </div>
     </div>
     <section id="inventory" aria-label="Inventario">
       <div>
@@ -442,8 +485,8 @@ pre {
     <div id="win"><div class="endBox"><h2>SALISTE DE LA FORJA</h2><p id="winStats"></p><p>Presiona R para reiniciar.</p></div></div>
   </main>
   <aside id="graphPanel">
-    <section class="section">
-      <h2>Grafo de Build</h2>
+    <section id="buildSection" class="section">
+      <h2>Cuerpo / Grafo de Build</h2>
       <canvas id="buildCanvas"></canvas>
       <pre id="adjList"></pre>
     </section>
@@ -479,13 +522,15 @@ pre {
       ["Head",  []],
       ["RArm",  []],
       ["LArm",  []],
+      ["RHand", []],
+      ["LHand", []],
       ["Chest", []],
       ["Legs",  []]
     ]);
 
-    const SLOT_NAMES = ["Head", "RArm", "LArm", "Chest", "Legs"];
-    const slotLabel = {Head:"Head", RArm:"R.Arm", LArm:"L.Arm", Chest:"Chest", Legs:"Legs"};
-    const slotEs = {Head:"Cabeza", RArm:"Brazo D.", LArm:"Brazo I.", Chest:"Pecho", Legs:"Piernas"};
+    const SLOT_NAMES = ["Head", "RArm", "LArm", "RHand", "LHand", "Chest", "Legs"];
+    const slotLabel = {Head:"Head", RArm:"R.Arm", LArm:"L.Arm", RHand:"R.Hand", LHand:"L.Hand", Chest:"Chest", Legs:"Legs"};
+    const slotEs = {Head:"Cabeza", RArm:"Brazo D.", LArm:"Brazo I.", RHand:"Mano D.", LHand:"Mano I.", Chest:"Pecho", Legs:"Piernas"};
     const roomEs = {Room1:"Cripta", Room2:"Umbral", Room3:"Osario", Room4:"Forja", Room5:"Abismo", Room6:"Trono"};
     const partEs = {
       "Bone Arm":"Brazo Oseo",
@@ -523,17 +568,17 @@ pre {
     const partTemplates = {
       "Bone Arm": {slot:"LArm", stats:{atk:2}, edges:[["LArm","Chest"]], color:"#e8e0d0"},
       "Skull": {slot:"Head", stats:{def:1}, edges:[["Head","Chest"]], color:"#e8e0d0"},
-      "Dagger Hand": {slot:"RArm", stats:{atk:4, spd:-1}, edges:[["RArm","Chest"],["RArm","Head"]], color:"#b8ffda"},
+      "Dagger Hand": {slot:"RHand", stats:{atk:4, spd:-1}, edges:[["RHand","RArm"],["RHand","Head"]], color:"#b8ffda"},
       "Goblin Legs": {slot:"Legs", stats:{spd:3}, edges:[["Legs","Chest"]], color:"#00ff88"},
-      "Demon Claw": {slot:"RArm", stats:{atk:7, def:-2}, edges:[["RArm","Chest"],["RArm","Head"]], color:"#ff2b2b"},
+      "Demon Claw": {slot:"RHand", stats:{atk:7, def:-2}, edges:[["RHand","RArm"],["RHand","Head"]], color:"#ff2b2b"},
       "Demon Core": {slot:"Chest", stats:{hp:20}, edges:[["Chest","Head"],["Chest","Legs"],["Chest","LArm"]], color:"#8b0000"},
-      "Stone Fist": {slot:"LArm", stats:{atk:10}, edges:[["LArm","Chest"],["LArm","RArm"]], color:"#b6b6a8"},
+      "Stone Fist": {slot:"LHand", stats:{atk:10}, edges:[["LHand","LArm"],["LHand","Chest"]], color:"#b6b6a8"},
       "Golem Heart": {slot:"Chest", stats:{hp:40, def:5}, edges:[["Chest","Head"],["Chest","Legs"],["Chest","RArm"],["Chest","LArm"]], color:"#ffd700"},
       "Crown of Conquest": {slot:"Head", stats:{hp:3, atk:3, def:3, spd:3}, edges:[["Head","Chest"],["Head","RArm"],["Head","LArm"]], color:"#ffd700"},
-      "Kingbreaker Relic": {slot:"Chest", stats:{hp:70, atk:18, def:8, spd:10}, edges:[["Chest","Head"],["Chest","Legs"],["Chest","RArm"],["Chest","LArm"],["Head","RArm"]], color:"#ffef6e"},
+      "Kingbreaker Relic": {slot:"Chest", stats:{hp:70, atk:18, def:8, spd:10}, edges:[["Chest","Head"],["Chest","Legs"],["Chest","RArm"],["Chest","LArm"],["Head","RHand"]], color:"#ffef6e"},
       "Root Mask": {slot:"Head", stats:{hp:12, def:2}, edges:[["Head","Chest"],["Head","LArm"]], color:"#9fd968"},
       "Mist Tabi": {slot:"Legs", stats:{spd:10, def:1}, edges:[["Legs","Chest"],["Legs","RArm"]], color:"#b8ffda"},
-      "Blood Seal": {slot:"RArm", stats:{atk:10, hp:10}, edges:[["RArm","Chest"],["RArm","Head"],["RArm","Legs"]], color:"#ff3d3d"},
+      "Blood Seal": {slot:"RHand", stats:{atk:10, hp:10}, edges:[["RHand","RArm"],["RHand","Head"],["RHand","Legs"]], color:"#ff3d3d"},
       "Void Crown": {slot:"Head", stats:{hp:30, atk:12, def:6, spd:6}, edges:[["Head","Chest"],["Head","RArm"],["Head","LArm"],["Chest","Legs"]], color:"#ffd700"}
     };
     const enemyTypes = [
@@ -542,10 +587,10 @@ pre {
       {name:"DEMON BRUTE", hp:34, atk:9, speed:28, color:"#8b0000", drops:["Demon Claw","Demon Core"]}
     ];
     const levels = [
-      {name:"Bosque Hundido", boss:"Guardian de Raiz", reward:"Root Mask", minions:3, hp:70, atk:10, speed:25, sky:["#c9dee0","#7fa6a8","#26444f","#071014"], accent:"#9fd968"},
-      {name:"Templo de Niebla", boss:"Monje del Osario", reward:"Mist Tabi", minions:4, hp:115, atk:14, speed:32, sky:["#d6d9e3","#8d9aaa","#414a64","#090b16"], accent:"#b8ffda"},
-      {name:"Forja Sangrienta", boss:"Herrero Demonio", reward:"Blood Seal", minions:5, hp:165, atk:19, speed:35, sky:["#d9b8a1","#8a4a3a","#33151b","#080407"], accent:"#ff3d3d"},
-      {name:"Trono del Vacio", boss:"Rey del Vacio", reward:"Void Crown", minions:6, hp:235, atk:25, speed:42, sky:["#c8c5da","#71668f","#211c36","#030307"], accent:"#ffd700"}
+      {name:"Bosque Hundido", boss:"Guardian de Raiz", reward:"Root Mask", sideReward:"Bone Arm", minions:3, hp:70, atk:10, speed:58, sky:["#c9dee0","#7fa6a8","#26444f","#071014"], accent:"#9fd968"},
+      {name:"Templo de Niebla", boss:"Monje del Osario", reward:"Mist Tabi", sideReward:"Dagger Hand", minions:4, hp:115, atk:14, speed:32, sky:["#d6d9e3","#8d9aaa","#414a64","#090b16"], accent:"#b8ffda"},
+      {name:"Forja Sangrienta", boss:"Herrero Demonio", reward:"Blood Seal", sideReward:"Demon Core", minions:5, hp:165, atk:19, speed:35, sky:["#d9b8a1","#8a4a3a","#33151b","#080407"], accent:"#ff3d3d"},
+      {name:"Trono del Vacio", boss:"Rey del Vacio", reward:"Void Crown", sideReward:"Golem Heart", minions:6, hp:235, atk:25, speed:42, sky:["#c8c5da","#71668f","#211c36","#030307"], accent:"#ffd700"}
     ];
     const keys = new Set();
     const logLines = [];
@@ -556,32 +601,80 @@ pre {
     const stolenRewards = new Set();
     const traversalHistory = [];
     const pathAnim = {visited:[], finalPath:[], step:0, timer:0, distances:new Map(), label:"esperando algoritmo"};
-    const playerSprite = {
-      img: new Image(),
-      ready: false,
-      frameW: 64,
-      frameH: 64,
-      cols: 8,
-      rows: 8,
-      scale: 1.35
+    let buildGraphHitNodes = [];
+    let buildGraphSlotTargets = [];
+    let buildGraphHover = null;
+    let buildGraphDrag = null;
+    const assetLoads = [];
+    let assetsReady = false, paused = false, gameStarted = false;
+    const heroSprites = {
+      frameW: 42,
+      frameH: 42,
+      loaded: 0,
+      total: 0,
+      sheets: {}
     };
-    playerSprite.img.onload = () => { playerSprite.ready = true; log("Spritesheet del jugador cargado: assets/player-spritesheet.png"); };
-    playerSprite.img.onerror = () => { playerSprite.ready = false; log("Spritesheet del jugador no encontrado: usando rana ronin procedural"); };
-    playerSprite.img.src = "assets/player-spritesheet.png";
+    const heroSheetDefs = {
+      idle:["Idle.png", 4],
+      run:["Run.png", 6],
+      walk:["Walk.png", 6],
+      shoot:["Attack.png", 6],
+      runShoot:["RunAttack.png", 6],
+      jump:["Jump.png", 8],
+      jumpShoot:["JumpAttack.png", 6],
+      hurt:["Hurt.png", 4],
+      death:["Death.png", 8]
+    };
+    for (const [name, [file, frames]] of Object.entries(heroSheetDefs)) {
+      heroSprites.total++;
+      const img = new Image();
+      heroSprites.sheets[name] = {img, frames, ready:false};
+      assetLoads.push(new Promise(resolve => {
+        img.onload = () => {
+          heroSprites.sheets[name].ready = true;
+          heroSprites.loaded++;
+          if (heroSprites.loaded === heroSprites.total) log("Hero asset cargado: assets/hero-3");
+          if (img.decode) img.decode().catch(() => {}).finally(resolve);
+          else resolve();
+        };
+        img.onerror = () => { log(`No se pudo cargar animacion hero-3/${file}`); resolve(); };
+      }));
+      img.src = `assets/hero-3-clean/${file}`;
+    }
     const levelScene = {img:new Image(), ready:false, x:0, y:0, w:0, h:0};
-    levelScene.img.onload = () => { levelScene.ready = true; log("Escenario top-down cargado para Nivel 1"); };
+    assetLoads.push(new Promise(resolve => {
+      levelScene.img.onload = () => {
+        levelScene.ready = true;
+        log("Escenario top-down cargado para Nivel 1");
+        if (levelScene.img.decode) levelScene.img.decode().catch(() => {}).finally(resolve);
+        else resolve();
+      };
+      levelScene.img.onerror = () => { log("No se pudo cargar level1-scene.png"); resolve(); };
+    }));
     levelScene.img.src = "assets/level1-scene.png";
+    const bossLevel1Sprite = {img:new Image(), ready:false, frameW:144, frameH:128, frames:5};
+    assetLoads.push(new Promise(resolve => {
+      bossLevel1Sprite.img.onload = () => {
+        bossLevel1Sprite.ready = true;
+        log("Sprite del jefe Nivel 1 cargado");
+        if (bossLevel1Sprite.img.decode) bossLevel1Sprite.img.decode().catch(() => {}).finally(resolve);
+        else resolve();
+      };
+      bossLevel1Sprite.img.onerror = () => { log("No se pudo cargar boss-level1-walk.png"); resolve(); };
+    }));
+    bossLevel1Sprite.img.src = "assets/boss-level1-walk.png";
     let w = 900, h = 600, tick = 0, shake = 0, inventoryOpen = false, gameOver = false, won = false, choosingBossReward = false, cycleRun = 1;
     let last = performance.now();
 
     const player = {
       x: 210, y: 210, r: 13, room:"Room1", hp:100, maxHp:100, base:{hp:100, atk:8, def:2, spd:95},
-      atk:8, def:2, spd:95, invincible:0, attack:0, shotCooldown:0, dir:{x:1,y:0}, vy:0, onGround:false, inventory:[], equipped:{Head:null,RArm:null,LArm:null,Chest:null,Legs:null},
+      atk:8, def:2, spd:95, invincible:0, attack:0, shotCooldown:0, dir:{x:1,y:0}, vy:0, onGround:false, inventory:[], equipped:{Head:null,RArm:null,LArm:null,RHand:null,LHand:null,Chest:null,Legs:null},
       combos:new Set()
     };
     let wave = 1;
     let levelState = "levelStart";
     let awaitingBossReward = false;
+    let bossRewardClaimed = false;
     let spawnTimer = 0;
     let boss = null;
 
@@ -593,8 +686,10 @@ pre {
       if (!player.onGround) placePlayerOnPath();
       for (const c of [buildCanvas, mapCanvas]) {
         const r = c.getBoundingClientRect();
-        c.width = Math.max(240, Math.floor(r.width));
-        c.height = Math.max(110, Math.floor(r.height));
+        const dpr = Math.max(1, globalThis.devicePixelRatio || 1);
+        c.dataset.dpr = String(dpr);
+        c.width = Math.max(1, Math.floor(r.width * dpr));
+        c.height = Math.max(1, Math.floor(r.height * dpr));
       }
     }
     addEventListener("resize", resize);
@@ -838,7 +933,7 @@ pre {
       player.spd = Math.max(45, totals.spd);
       player.hp = Math.min(player.hp, player.maxHp);
       player.combos.clear();
-      if (hasPath("RArm", "Legs", ["Chest"])) player.combos.add("Berserker");
+      if (hasPath("RHand", "Legs", ["RArm", "Chest"])) player.combos.add("Berserker");
       if (hasCycle()) player.combos.add("Cycle Ward");
       if (isSlotEquipped("Head") && isSlotEquipped("Chest") && isSlotEquipped("Legs")) player.combos.add("Undying Spine");
     }
@@ -892,6 +987,7 @@ pre {
       enemies.length = 0;
       drops.length = 0;
       awaitingBossReward = false;
+      bossRewardClaimed = false;
       for (let i = 0; i < level.minions + cycleRun - 1; i++) {
         const tier = Math.min(enemyTypes.length - 1, Math.floor(Math.random() * Math.min(enemyTypes.length, wave + 1)));
         const type = enemyTypes[tier];
@@ -1024,9 +1120,7 @@ pre {
       const idx = enemies.indexOf(e);
       if (idx >= 0) enemies.splice(idx, 1);
       explode(e.x, e.y, e.color, 22);
-      const name = e.drops[Math.floor(Math.random() * e.drops.length)];
-      drops.push({x:e.x, y:groundYAt(e.x) - 10, part:makePart(name), bob:0});
-      log(`${enemyEs[e.name]} derrotado: solto ${partEs[name]}`);
+      log(`${enemyEs[e.name]} derrotado: sin botin. Solo los jefes sueltan objetos.`);
     }
 
     function damageBoss(amount) {
@@ -1034,12 +1128,20 @@ pre {
       shake = 8;
       explode(boss.x, boss.y, "#8b0000", 8);
       if (boss.hp <= 0) {
-        const dropName = boss.reward;
-        const dropX = boss.x + rand(-20,20);
-        const part = makePart(dropName);
-        part.levelReward = true;
-        drops.push({x:dropX, y:groundYAt(dropX) - 12, part, bob:0});
-        log(`${boss.name} derrotado: robale ${partEs[dropName]} para abrir el siguiente nivel.`);
+        const defeatedBoss = boss;
+        const level = currentLevel();
+        const main = makePart(defeatedBoss.reward);
+        const support = makePart(level.sideReward);
+        main.levelReward = true;
+        main.bossLoot = true;
+        support.bossLoot = true;
+        support.supportReward = true;
+        const baseY = isTopDownLevel() ? defeatedBoss.y : groundYAt(defeatedBoss.x) - 12;
+        drops.push({x:defeatedBoss.x - 18, y:baseY, part:main, bob:0});
+        drops.push({x:defeatedBoss.x + 22, y:baseY, part:support, bob:Math.PI});
+        bossRewardClaimed = false;
+        log(`${defeatedBoss.name} derrotado: solto 2 objetos maximo.`);
+        log(`Clave: ${partEs[main.name]} para el siguiente jefe | Apoyo: ${partEs[support.name]}`);
         boss = null;
         awaitingBossReward = true;
         levelState = "reward";
@@ -1061,6 +1163,7 @@ pre {
       wave = 1;
       levelState = "levelStart";
       awaitingBossReward = false;
+      bossRewardClaimed = false;
       spawnTimer = .7;
       enemies.length = 0;
       drops.length = 0;
@@ -1075,6 +1178,7 @@ pre {
 
     function advanceLevelAfterReward() {
       awaitingBossReward = false;
+      bossRewardClaimed = false;
       const completed = currentLevel();
       if (completed) stolenRewards.add(completed.reward);
       if (wave >= levels.length) {
@@ -1120,6 +1224,31 @@ pre {
       if (!boss) return;
       boss.moveCooldown -= dt * 60;
       boss.hitCooldown = Math.max(0, boss.hitCooldown - dt);
+      if (isTopDownLevel()) {
+        const moving = keys.has("a") || keys.has("d") || keys.has("w") || keys.has("s");
+        const lead = moving ? 32 : 10;
+        const target = {
+          x: player.x + player.dir.x * lead,
+          y: player.y + player.dir.y * lead
+        };
+        moveTopDownChaser(boss, target.x, target.y, (boss.speed + boss.phase * 14 + cycleRun * 4) * dt);
+        boss.room = nearestRoom(boss.x, boss.y);
+        if (boss.moveCooldown <= 0) {
+          const res = bfs(boss.room, player.room);
+          pathAnim.visited = res.order;
+          pathAnim.finalPath = res.path;
+          pathAnim.step = 0;
+          pathAnim.distances = new Map(res.order.map((n, i) => [n, i]));
+          pathAnim.label = `BFS + caza directa: ${roomEs[boss.room]} -> ${roomEs[player.room]}`;
+          traversalHistory.push(`B:${res.path.join(">")}`);
+          log(`BFS del jefe: ${res.order.map(r => roomEs[r]).join("->")} | persecucion directa en mapa`);
+          boss.moveCooldown = 32;
+        }
+        if (Math.hypot(boss.x - player.x, boss.y - player.y) < boss.r + player.r && boss.hitCooldown <= 0) {
+          hitPlayer(boss.atk); boss.hitCooldown = 1.05;
+        }
+        return;
+      }
       if (boss.moveCooldown <= 0) {
         const res = bfs(boss.room, player.room);
         pathAnim.visited = res.order; pathAnim.finalPath = res.path; pathAnim.step = 0; pathAnim.distances = new Map(res.order.map((n,i) => [n,i])); pathAnim.label = `BFS de ${roomEs[boss.room]} a ${roomEs[player.room]}`;
@@ -1176,6 +1305,18 @@ pre {
       obj.x += dx / len * step; obj.y += dy / len * step;
     }
 
+    function moveTopDownChaser(obj, x, y, step) {
+      const dx = x - obj.x, dy = y - obj.y, len = Math.hypot(dx, dy) || 1;
+      const nx = obj.x + dx / len * step;
+      const ny = obj.y + dy / len * step;
+      if (isTopDownWalkable(nx, obj.y)) obj.x = nx;
+      if (isTopDownWalkable(obj.x, ny)) obj.y = ny;
+      if (!isTopDownWalkable(obj.x, obj.y)) {
+        const fallback = roomScreen(nearestRoom(obj.x, obj.y));
+        moveToward(obj, fallback.x, fallback.y, step * .35);
+      }
+    }
+
     function pickupNearest(force) {
       for (const d of [...drops]) {
         d.bob += .1;
@@ -1183,11 +1324,12 @@ pre {
         if (near) {
           drops.splice(drops.indexOf(d), 1);
           player.inventory.push(d.part);
-          log(`Pieza recogida: ${partEs[d.part.name]}`);
+          log(`Pieza recogida: ${partEs[d.part.name]}${d.part.levelReward ? " (clave)" : d.part.supportReward ? " (apoyo)" : ""}`);
           if (d.part.levelReward) equipPart(d.part);
           else if (!player.equipped[d.part.slot]) equipPart(d.part);
           updateInventory();
-          if (d.part.levelReward) advanceLevelAfterReward();
+          if (d.part.levelReward) bossRewardClaimed = true;
+          if (awaitingBossReward && bossRewardClaimed && !drops.some(x => x.part.bossLoot)) advanceLevelAfterReward();
         }
       }
     }
@@ -1217,6 +1359,44 @@ pre {
       drawBuildGraph();
       drawMapGraph();
       updateHud();
+    }
+
+    function drawLoadingScreen(progress) {
+      g.clearRect(0, 0, w, h);
+      g.fillStyle = "#050508";
+      g.fillRect(0, 0, w, h);
+      g.fillStyle = "#ffd700";
+      g.font = "700 24px Segoe UI, Arial, sans-serif";
+      g.textAlign = "center";
+      g.fillText("NECROFORGE", w / 2, h / 2 - 38);
+      g.fillStyle = "#e8e0d0";
+      g.font = "12px Segoe UI, Arial, sans-serif";
+      g.fillText("Cargando sprites y grafos...", w / 2, h / 2 - 12);
+      const bw = Math.min(320, w - 80), bx = (w - bw) / 2, by = h / 2 + 12;
+      g.fillStyle = "#0a0a0f";
+      g.fillRect(bx, by, bw, 14);
+      g.fillStyle = "#00ff88";
+      g.fillRect(bx + 2, by + 2, (bw - 4) * clamp(progress, 0, 1), 10);
+      g.strokeStyle = "#765a88";
+      g.strokeRect(bx, by, bw, 14);
+      drawBuildGraph();
+      drawMapGraph();
+    }
+
+    function setPaused(value) {
+      if (!gameStarted || gameOver || won || choosingBossReward) return;
+      paused = value;
+      keys.clear();
+      const btn = document.getElementById("pauseBtn");
+      btn.setAttribute("aria-pressed", paused ? "true" : "false");
+      btn.textContent = paused ? "SEGUIR" : "PAUSA";
+      document.getElementById("pauseOverlay").classList.toggle("show", paused);
+      if (paused) log("Pausa activada: simulacion congelada");
+      else log("Pausa desactivada: simulacion reanudada");
+    }
+
+    function togglePause() {
+      setPaused(!paused);
     }
 
     function drawDungeon() {
@@ -1260,7 +1440,7 @@ pre {
       g.lineWidth = 2;
       g.strokeRect(w * .5 - 118, 18, 236, 24);
       g.fillStyle = levels[0].accent;
-      g.font = "14px Courier New";
+      g.font = "700 14px Segoe UI, Arial, sans-serif";
       g.textAlign = "center";
       g.fillText(`NIVEL 1: ${levels[0].name}`, w * .5, 35);
     }
@@ -1289,12 +1469,12 @@ pre {
       g.lineWidth = 2;
       g.strokeRect(w * .5 - 118, signY, 236, 24);
       g.fillStyle = level.accent;
-      g.font = "14px Courier New";
+      g.font = "700 14px Segoe UI, Arial, sans-serif";
       g.textAlign = "center";
       g.fillText(`NIVEL ${wave}: ${level.name}`, w * .5, signY + 17);
       if (levelState === "reward") {
         g.fillStyle = "#ffd700";
-        g.fillText(`ROBA ${partEs[level.reward]} PARA AVANZAR`, w * .5, signY + 44);
+        g.fillText(`RECOGE CLAVE + APOYO DEL JEFE`, w * .5, signY + 44);
       } else if (levelState === "boss" && boss) {
         g.fillStyle = "#ffef6e";
         g.fillText(`JEFE: ${level.boss}`, w * .5, signY + 44);
@@ -1480,37 +1660,31 @@ pre {
     }
 
     function drawPlayerSprite(x, y) {
-      if (!playerSprite.ready) {
+      const moving = keys.has("a") || keys.has("d") || (isTopDownLevel() && (keys.has("w") || keys.has("s")));
+      const airborne = !player.onGround && !isTopDownLevel();
+      const shooting = player.attack > 0;
+      const hurt = player.invincible > 0;
+      let action = "idle";
+      if (hurt) action = "hurt";
+      else if (airborne && shooting) action = "jumpShoot";
+      else if (airborne) action = "jump";
+      else if (moving && shooting) action = "runShoot";
+      else if (shooting) action = "shoot";
+      else if (moving) action = isTopDownLevel() ? "walk" : "run";
+      const sheet = heroSprites.sheets[action];
+      if (!sheet || !sheet.ready) {
         drawKnight(x, y, isTopDownLevel() ? .62 : 1.05);
         return;
       }
-      const moving = keys.has("a") || keys.has("d");
-      const airborne = !player.onGround;
-      let row = 6;
-      let frames = 8;
-      let frame = Math.floor(tick / 7) % frames;
-      if (airborne) {
-        row = 1;
-        frame = player.vy < 0 ? 0 : 4;
-      } else if (player.attack > 0) {
-        row = 3;
-        frames = 4;
-        frame = Math.min(3, Math.floor((1 - player.attack) * 4));
-      } else if (moving) {
-        row = 6;
-        frame = Math.floor(tick / 5) % 8;
-      } else {
-        row = 7;
-        frames = 4;
-        frame = Math.floor(tick / 14) % frames;
-      }
-      const sw = playerSprite.frameW, sh = playerSprite.frameH;
-      const levelScale = isTopDownLevel() ? .72 : playerSprite.scale;
+      const frameSpeed = shooting ? 4 : moving ? 6 : 12;
+      const frame = Math.floor(tick / frameSpeed) % sheet.frames;
+      const sw = heroSprites.frameW, sh = heroSprites.frameH;
+      const levelScale = isTopDownLevel() ? 1.15 : 1.55;
       const dw = sw * levelScale, dh = sh * levelScale;
       g.save();
-      g.translate(x, y + 3);
+      g.translate(x, y + (isTopDownLevel() ? 7 : 3));
       if (player.dir.x < 0) g.scale(-1, 1);
-      g.drawImage(playerSprite.img, frame * sw, row * sh, sw, sh, -dw / 2, -dh + 23, dw, dh);
+      g.drawImage(sheet.img, frame * sw, 0, sw, sh, -dw / 2, -dh + (isTopDownLevel() ? 27 : 23), dw, dh);
       g.restore();
     }
 
@@ -1579,6 +1753,23 @@ pre {
     function drawBoss() {
       const b = boss;
       if (isTopDownLevel()) {
+        if (bossLevel1Sprite.ready) {
+          const sw = bossLevel1Sprite.frameW;
+          const sh = bossLevel1Sprite.frameH;
+          const frame = Math.floor(tick / 14) % bossLevel1Sprite.frames;
+          const scale = 0.56;
+          const dw = sw * scale;
+          const dh = sh * scale;
+          g.fillStyle = "rgba(0,0,0,.38)";
+          g.fillRect(b.x - 25, b.y + 16, 50, 9);
+          g.save();
+          g.translate(b.x, b.y + 22);
+          if (b.x < player.x) g.scale(-1, 1);
+          g.drawImage(bossLevel1Sprite.img, frame * sw, 0, sw, sh, -dw / 2, -dh + 12, dw, dh);
+          g.restore();
+          healthBar(b.x - 36, b.y - 54, 72, 6, b.hp / b.maxHp);
+          return;
+        }
         g.fillStyle = "rgba(0,0,0,.45)"; g.fillRect(b.x-22,b.y+12,44,7);
         g.fillStyle = "#050508"; g.fillRect(b.x-18,b.y-25,36,38);
         g.fillStyle = "#6d6680"; g.fillRect(b.x-14,b.y-22,28,32);
@@ -1600,12 +1791,19 @@ pre {
     }
     function drawDrop(d) {
       const y = d.y + Math.sin(d.bob) * 3;
-      g.fillStyle = "rgba(255,215,0,.24)";
+      g.fillStyle = d.part.levelReward ? "rgba(255,215,0,.28)" : "rgba(60,247,255,.20)";
       g.fillRect(d.x-14,y-14,28,28);
       g.fillStyle = d.part.color;
       g.fillRect(d.x-5,y-5,10,10); g.fillRect(d.x-8,y-2,16,4);
       g.fillStyle = "#fff4b0"; g.fillRect(d.x-2,y-7,4,3);
-      g.strokeStyle = "#ffd700"; g.lineWidth = 1; g.strokeRect(d.x-11,y-11,22,22);
+      g.strokeStyle = d.part.levelReward ? "#ffd700" : "#3cf7ff";
+      g.lineWidth = 1; g.strokeRect(d.x-11,y-11,22,22);
+      if (d.part.bossLoot) {
+        g.fillStyle = d.part.levelReward ? "#ffd700" : "#3cf7ff";
+        g.font = "700 9px Arial, sans-serif";
+        g.textAlign = "center";
+        g.fillText(d.part.levelReward ? "CLAVE" : "APOYO", d.x, y - 18);
+      }
     }
     function healthBar(x,y,width,height,pct) {
       g.fillStyle = "#0a0a0f"; g.fillRect(x,y,width,height);
@@ -1613,16 +1811,101 @@ pre {
     }
 
     function drawBuildGraph() {
-      const cw = buildCanvas.width, ch = buildCanvas.height;
+      const dpr = Number(buildCanvas.dataset.dpr || 1);
+      const cw = buildCanvas.width / dpr, ch = buildCanvas.height / dpr;
+      bg.setTransform(dpr, 0, 0, dpr, 0, 0);
       bg.clearRect(0,0,cw,ch);
+      buildGraphHitNodes = [];
+      buildGraphSlotTargets = [];
+      bg.save();
+      const pulse = (Math.sin(tick * .08) + 1) * .5;
+      bg.font = "700 12px Arial, sans-serif";
+      bg.textAlign = "left";
+      bg.fillStyle = "#ffd700";
+      bg.fillText("Inventario disponible", 10, 17);
+      bg.strokeStyle = "rgba(118,90,136,.55)";
+      bg.lineWidth = 1;
+      bg.beginPath(); bg.moveTo(0, 44); bg.lineTo(cw, 44); bg.stroke();
+      const shelfCount = Math.min(6, Math.max(3, Math.floor(cw / 58)));
+      const shelfParts = player.inventory.slice(0, shelfCount);
+      const shelfGap = cw / Math.max(1, shelfParts.length + 1);
+      shelfParts.forEach((part, i) => {
+        const dragged = buildGraphDrag && buildGraphDrag.part.id === part.id;
+        const x = dragged ? buildGraphDrag.x : shelfGap * (i + 1);
+        const y = dragged ? buildGraphDrag.y : 27 + Math.sin(tick * .06 + i) * 3;
+        const r = dragged ? 16 : 13 + Math.sin(tick * .08 + i) * 1.4;
+        buildGraphHitNodes.push({x, y, r:r + 6, part});
+        const hovered = buildGraphHover === part.id;
+        bg.globalAlpha = dragged ? .68 : 1;
+        bg.fillStyle = hovered || dragged ? "rgba(255,215,0,.18)" : "rgba(0,255,136,.08)";
+        bg.beginPath(); bg.arc(x, y, r + 5, 0, Math.PI * 2); bg.fill();
+        bg.fillStyle = part.color;
+        bg.beginPath(); bg.arc(x, y, r, 0, Math.PI * 2); bg.fill();
+        bg.strokeStyle = hovered || dragged ? "#ffd700" : "#00ff88";
+        bg.lineWidth = hovered || dragged ? 3 : 2;
+        bg.stroke();
+        bg.globalAlpha = 1;
+        bg.fillStyle = "#050508";
+        bg.font = "700 10px Arial, sans-serif";
+        bg.textAlign = "center";
+        bg.fillText(slotLabel[part.slot], x, y + 3);
+        bg.fillStyle = "#e8e0d0";
+        bg.font = "10px Arial, sans-serif";
+        bg.fillText(partEs[part.name].split(" ")[0], x, y + 25);
+      });
+      if (!shelfParts.length) {
+        bg.fillStyle = "#7d748d";
+        bg.font = "11px Arial, sans-serif";
+        bg.textAlign = "center";
+        bg.fillText("sin piezas fuera del cuerpo", cw / 2, 31);
+      }
       const pos = {
-        Head:{x:cw*.5,y:ch*.18}, Chest:{x:cw*.5,y:ch*.48}, LArm:{x:cw*.25,y:ch*.45}, RArm:{x:cw*.75,y:ch*.45}, Legs:{x:cw*.5,y:ch*.8}
+        Head:{x:cw*.5,y:ch*.36},
+        Chest:{x:cw*.5,y:ch*.56},
+        LArm:{x:cw*.30,y:ch*.55},
+        RArm:{x:cw*.70,y:ch*.55},
+        LHand:{x:cw*.15,y:ch*.62},
+        RHand:{x:cw*.85,y:ch*.62},
+        Legs:{x:cw*.5,y:ch*.72},
+        LLeg:{x:cw*.34,y:ch*.88},
+        RLeg:{x:cw*.66,y:ch*.88}
       };
+      const visualEdges = [["Head","Chest"], ["Chest","LArm"], ["Chest","RArm"], ["LArm","LHand"], ["RArm","RHand"], ["Chest","Legs"], ["Legs","LLeg"], ["Legs","RLeg"]];
+      bg.lineCap = "round";
+      bg.strokeStyle = "rgba(232,224,208,.18)";
+      bg.lineWidth = 6;
+      for (const [a,b] of visualEdges) {
+        bg.beginPath(); bg.moveTo(pos[a].x,pos[a].y); bg.lineTo(pos[b].x,pos[b].y); bg.stroke();
+      }
       const activePath = player.combos.has("Berserker") ? new Set(["RArm-Chest","Chest-Legs"]) : new Set();
+      const mst = kruskalOptimalBuild();
+      const mstEdges = new Set(mst.map(e => edgeKey(e.a, e.b)));
+      for (const e of mst) {
+        const shelfNode = buildGraphHitNodes.find(n => n.part.name === e.part);
+        if (!shelfNode) continue;
+        bg.strokeStyle = "rgba(255,215,0,.25)";
+        bg.setLineDash([3, 5]);
+        bg.lineWidth = 2;
+        bg.beginPath();
+        bg.moveTo(shelfNode.x, shelfNode.y + shelfNode.r);
+        bg.lineTo(pos[e.a].x, pos[e.a].y - 18);
+        bg.stroke();
+      }
+      for (const e of mst) {
+        bg.strokeStyle = "rgba(255,215,0,.82)";
+        bg.setLineDash([7, 5]);
+        bg.lineWidth = 4;
+        bg.beginPath(); bg.moveTo(pos[e.a].x,pos[e.a].y); bg.lineTo(pos[e.b].x,pos[e.b].y); bg.stroke();
+        drawFlowDot(bg, pos[e.a], pos[e.b], "#ffd700", tick * .018 + e.weight * .07);
+      }
+      bg.setLineDash([]);
       for (const [a, edges] of buildGraph) for (const b of edges) if (a < b) {
         const key = activePath.has(`${a}-${b}`) || activePath.has(`${b}-${a}`);
-        bg.strokeStyle = key ? "#ffd700" : "#7b4e98"; bg.lineWidth = key ? 5 : 2;
+        const inMst = mstEdges.has(edgeKey(a, b));
+        bg.strokeStyle = key ? "#ffd700" : inMst ? "#00ff88" : "#7b4e98";
+        bg.lineWidth = key ? 6 : inMst ? 4 : 2;
         bg.beginPath(); bg.moveTo(pos[a].x,pos[a].y); bg.lineTo(pos[b].x,pos[b].y); bg.stroke();
+        drawFlowDot(bg, pos[a], pos[b], key ? "#ffd700" : "#00ff88", tick * .025 + a.length * .1);
         if (key) {
           bg.strokeStyle = "rgba(255,215,0,.22)"; bg.lineWidth = 11;
           bg.beginPath(); bg.moveTo(pos[a].x,pos[a].y); bg.lineTo(pos[b].x,pos[b].y); bg.stroke();
@@ -1630,19 +1913,78 @@ pre {
       }
       for (const n of SLOT_NAMES) {
         const p = pos[n], equipped = isSlotEquipped(n);
-        bg.fillStyle = equipped ? "rgba(0,255,136,.14)" : "rgba(109,102,128,.08)";
-        bg.beginPath(); bg.arc(p.x,p.y,23,0,Math.PI*2); bg.fill();
-        bg.beginPath(); bg.arc(p.x,p.y,15,0,Math.PI*2);
-        bg.fillStyle = equipped ? "#1a0a2e" : "#050508"; bg.fill();
-        bg.strokeStyle = equipped ? "#00ff88" : "#6d6680"; bg.setLineDash(equipped ? [] : [4,4]); bg.lineWidth = 2; bg.stroke(); bg.setLineDash([]);
-        bg.fillStyle = equipped ? "#e8e0d0" : "#6d6680"; bg.font = "11px Courier New"; bg.textAlign = "center";
-        bg.fillText(slotEs[n], p.x, p.y + 31);
+        const part = player.equipped[n];
+        const canDrop = buildGraphDrag && buildGraphDrag.part.slot === n;
+        buildGraphSlotTargets.push({slot:n, x:p.x, y:p.y, r:n === "Chest" ? 25 : 21});
+        const nodePulse = equipped ? 1 + pulse * 3 : 0;
+        bg.fillStyle = canDrop ? "rgba(255,215,0,.22)" : equipped ? part.color : "rgba(5,5,8,.86)";
+        bg.beginPath();
+        if (n === "Chest") bg.rect(p.x - 18 - nodePulse * .25, p.y - 15 - nodePulse * .25, 36 + nodePulse * .5, 30 + nodePulse * .5);
+        else bg.arc(p.x,p.y,(n === "Head" ? 18 : 15) + nodePulse * .3,0,Math.PI*2);
+        bg.fill();
+        bg.strokeStyle = canDrop ? "#ffd700" : equipped ? "#00ff88" : "#6d6680";
+        bg.setLineDash(equipped ? [] : [4,4]);
+        bg.lineWidth = 2;
+        bg.stroke();
+        bg.setLineDash([]);
+        bg.fillStyle = equipped ? "#050508" : "#6d6680";
+        bg.font = "700 11px Arial, sans-serif";
+        bg.textAlign = "center";
+        bg.fillText(slotLabel[n], p.x, p.y + 4);
+        bg.fillStyle = equipped ? "#e8e0d0" : "#7d748d";
+        bg.font = "11px Arial, sans-serif";
+        bg.fillText(equipped ? partEs[part.name].split(" ")[0] : "vacio", p.x, p.y + 29);
       }
-      document.getElementById("adjList").textContent = "Lista de adyacencia:\n" + SLOT_NAMES.map(n => `${slotEs[n]} -> [${buildGraph.get(n).map(x => slotEs[x]).join(", ")}]`).join("\n");
+      for (const n of ["LLeg", "RLeg"]) {
+        const p = pos[n];
+        bg.fillStyle = "rgba(5,5,8,.72)";
+        bg.beginPath(); bg.arc(p.x,p.y,13,0,Math.PI*2); bg.fill();
+        bg.strokeStyle = isSlotEquipped("Legs") ? "#00ff88" : "#6d6680";
+        bg.lineWidth = 2; bg.stroke();
+      }
+      if (buildGraphDrag) {
+        const target = buildGraphSlotTargets.find(t => t.slot === buildGraphDrag.part.slot);
+        if (target) {
+          bg.strokeStyle = "rgba(255,215,0,.5)";
+          bg.setLineDash([5, 5]);
+          bg.lineWidth = 2;
+          bg.beginPath();
+          bg.moveTo(buildGraphDrag.x, buildGraphDrag.y);
+          bg.lineTo(target.x, target.y);
+          bg.stroke();
+          bg.setLineDash([]);
+        }
+      }
+      bg.restore();
+      const adjacency = SLOT_NAMES.map(n => `${slotEs[n]} -> [${buildGraph.get(n).map(x => slotEs[x]).join(", ")}]`).join("\n");
+      const mstText = mst.length
+        ? mst.map(e => `${slotEs[e.a]}-${slotEs[e.b]} (${partEs[e.part]})`).join("\n")
+        : "sin arbol: faltan piezas candidatas";
+      if (tick % 12 === 0) document.getElementById("adjList").textContent = `Cuerpo = grafo/arbol de build\nLista de adyacencia:\n${adjacency}\n\nKruskal MST sugerido:\n${mstText}`;
+    }
+
+    function edgeKey(a, b) {
+      return [a, b].sort().join("-");
+    }
+
+    function drawFlowDot(ctx, a, b, color, phase) {
+      const t = phase - Math.floor(phase);
+      const x = a.x + (b.x - a.x) * t;
+      const y = a.y + (b.y - a.y) * t;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
     }
 
     function drawMapGraph() {
-      const cw = mapCanvas.width, ch = mapCanvas.height;
+      const dpr = Number(mapCanvas.dataset.dpr || 1);
+      const cw = mapCanvas.width / dpr, ch = mapCanvas.height / dpr;
+      mg.setTransform(dpr, 0, 0, dpr, 0, 0);
       mg.clearRect(0,0,cw,ch);
       const pos = levels.map((level, i) => ({
         x: cw * (.18 + (i % 2) * .62),
@@ -1660,7 +2002,7 @@ pre {
         mg.lineTo(b.x, b.y);
         mg.stroke();
         mg.fillStyle = unlocked ? "#00ff88" : "#6d6680";
-        mg.font = "10px Courier New";
+        mg.font = "10px Segoe UI, Arial, sans-serif";
         mg.textAlign = "center";
         mg.fillText(partEs[a.level.reward], (a.x + b.x) / 2, (a.y + b.y) / 2 - 5);
       }
@@ -1677,15 +2019,15 @@ pre {
         mg.lineWidth = 2;
         mg.stroke();
         mg.fillStyle = locked ? "#6d6680" : "#050508";
-        mg.font = "11px Courier New";
+        mg.font = "700 11px Segoe UI, Arial, sans-serif";
         mg.textAlign = "center";
         mg.fillText(`N${n.index}`, n.x, n.y + 4);
         mg.fillStyle = active ? "#ffd700" : completed ? "#00ff88" : "#e8e0d0";
-        mg.font = "10px Courier New";
+        mg.font = "10px Segoe UI, Arial, sans-serif";
         mg.fillText(n.level.boss.split(" ")[0], n.x, n.y + 32);
       }
       const objective = awaitingBossReward
-        ? `Robar: ${partEs[currentLevel().reward]}`
+        ? `Botin jefe: clave ${partEs[currentLevel().reward]} + apoyo ${partEs[currentLevel().sideReward]}`
         : boss
           ? `Derrotar jefe: ${currentLevel().boss}`
           : `Limpiar enemigos: ${currentLevel()?.name || "Final"}`;
@@ -1736,27 +2078,117 @@ pre {
     function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
     addEventListener("keydown", e => {
       const k = e.key.toLowerCase();
-      if (["w","a","s","d"," ","i","e","r","1","2"].includes(k)) e.preventDefault();
+      if (["w","a","s","d"," ","i","e","r","1","2","p"].includes(k)) e.preventDefault();
+      if (k === "p") {
+        togglePause();
+        return;
+      }
       keys.add(k);
     });
     addEventListener("keyup", e => keys.delete(e.key.toLowerCase()));
+    function canvasPointer(e) {
+      const rect = buildCanvas.getBoundingClientRect();
+      return {x:e.clientX - rect.left, y:e.clientY - rect.top};
+    }
+
+    function buildGraphNodeAt(x, y) {
+      let hit = buildGraphHitNodes.find(n => Math.hypot(n.x - x, n.y - y) <= n.r);
+      if (!hit && y <= 52 && buildGraphHitNodes.length) {
+        hit = buildGraphHitNodes.reduce((best, n) => {
+          const d = Math.hypot(n.x - x, n.y - y);
+          return !best || d < best.d ? {node:n, d} : best;
+        }, null)?.node;
+      }
+      return hit || null;
+    }
+
+    function buildGraphSlotAt(x, y, part) {
+      return buildGraphSlotTargets.find(t => t.slot === part.slot && Math.hypot(t.x - x, t.y - y) <= t.r + 10) || null;
+    }
+
+    buildCanvas.addEventListener("pointerdown", e => {
+      const p = canvasPointer(e);
+      const hit = buildGraphNodeAt(p.x, p.y);
+      if (!hit) return;
+      e.preventDefault();
+      buildCanvas.setPointerCapture?.(e.pointerId);
+      buildGraphDrag = {part:hit.part, x:p.x, y:p.y, dx:hit.x - p.x, dy:hit.y - p.y};
+      buildGraphHover = hit.part.id;
+      log(`Arrastrando nodo: ${partEs[hit.part.name]} -> ${slotEs[hit.part.slot]}`);
+    });
+    function moveBuildGraphPointer(e) {
+      const p = canvasPointer(e);
+      if (buildGraphDrag) {
+        buildGraphDrag.x = p.x + buildGraphDrag.dx;
+        buildGraphDrag.y = p.y + buildGraphDrag.dy;
+      }
+      const hit = buildGraphNodeAt(p.x, p.y);
+      buildGraphHover = hit ? hit.part.id : null;
+      buildCanvas.style.cursor = buildGraphDrag ? "grabbing" : hit ? "grab" : "default";
+    }
+    buildCanvas.addEventListener("mousemove", moveBuildGraphPointer);
+    buildCanvas.addEventListener("pointermove", moveBuildGraphPointer);
+    buildCanvas.addEventListener("pointerup", e => {
+      if (!buildGraphDrag) return;
+      const p = canvasPointer(e);
+      const part = buildGraphDrag.part;
+      const target = buildGraphSlotAt(p.x, p.y, part);
+      buildGraphDrag = null;
+      buildGraphHover = null;
+      if (target) {
+        equipPart(part);
+        log(`Nodo insertado en cuerpo/grafo: ${partEs[part.name]} conectado como ${slotEs[part.slot]}`);
+      } else {
+        log(`Nodo no insertado: ${partEs[part.name]} volvio al inventario`);
+      }
+    });
+    buildCanvas.addEventListener("pointerleave", () => {
+      if (buildGraphDrag) {
+        log(`Arrastre cancelado: ${partEs[buildGraphDrag.part.name]}`);
+        buildGraphDrag = null;
+      }
+      buildGraphHover = null;
+      buildCanvas.style.cursor = "default";
+    });
     document.getElementById("stealRelic").addEventListener("click", stealBossRelic);
     document.getElementById("leaveForge").addEventListener("click", () => finish(true));
+    document.getElementById("pauseBtn").addEventListener("click", togglePause);
 
     function loop(now) {
       const dt = Math.min(.05, (now - last) / 1000);
       last = now;
+      if (paused) {
+        draw();
+        requestAnimationFrame(loop);
+        return;
+      }
       update(dt);
       requestAnimationFrame(loop);
     }
 
+    async function startGame() {
+      resize();
+      drawLoadingScreen(.12);
+      let done = 0;
+      await Promise.all(assetLoads.map(p => p.then(() => {
+        done++;
+        drawLoadingScreen(done / Math.max(1, assetLoads.length));
+      })));
+      assetsReady = true;
+      placePlayerOnPath(150);
+      player.inventory.push(makePart("Skull"), makePart("Bone Arm"));
+      equipPart(player.inventory[0]);
+      spawnWave();
+      gameStarted = true;
+      last = performance.now();
+      log("Estructuras activas: Map dungeonGraph/buildGraph, Set de combos, PriorityQueue para Dijkstra");
+      log("Algoritmos listos: Dijkstra enemigos, BFS jefe, DFS ciclos, Kruskal inventario");
+      requestAnimationFrame(loop);
+    }
+
     resize();
-    placePlayerOnPath(150);
-    player.inventory.push(makePart("Skull"), makePart("Bone Arm"));
-    equipPart(player.inventory[0]);
-    spawnWave();
-    log("Graph data structures initialized: dungeonGraph + buildGraph");
-    requestAnimationFrame(loop);
+    drawLoadingScreen(.05);
+    startGame();
 
   </script>
 </body>

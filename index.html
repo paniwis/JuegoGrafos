@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NECROFORGE</title>
-  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/styles.css?v=15">
 </head>
 <body>
   <main id="gameWrap">
@@ -21,7 +21,14 @@
       <div class="hudRow">
         <span id="wave">OLEADA</span><span id="room">SALA</span><span id="combo">COMBO</span><span id="boss">JEFE</span>
       </div>
-      <div id="msg">A/D moverse, W saltar, S caer, ESPACIO disparar, I inventario, E recoger.</div>
+      <div id="msg">A/D moverse, W saltar, S caer, ESPACIO disparar, I inventario, E recoger, P pausar.</div>
+    </div>
+    <button id="pauseBtn" type="button" aria-pressed="false">PAUSA</button>
+    <div id="pauseOverlay">
+      <div class="endBox">
+        <h2>PAUSA</h2>
+        <p>La simulacion esta detenida. Presiona P o el boton para continuar.</p>
+      </div>
     </div>
     <section id="inventory" aria-label="Inventario">
       <div>
@@ -48,8 +55,8 @@
     <div id="win"><div class="endBox"><h2>SALISTE DE LA FORJA</h2><p id="winStats"></p><p>Presiona R para reiniciar.</p></div></div>
   </main>
   <aside id="graphPanel">
-    <section class="section">
-      <h2>Grafo de Build</h2>
+    <section id="buildSection" class="section">
+      <h2>Cuerpo / Grafo de Build</h2>
       <canvas id="buildCanvas"></canvas>
       <pre id="adjList"></pre>
     </section>
@@ -63,7 +70,7 @@
       <div id="log"></div>
     </section>
   </aside>
-  <script src="src/game.js"></script>
+  <script src="src/game.js?v=15"></script>
 </body>
 </html>
 

@@ -25,7 +25,7 @@ body {
     radial-gradient(circle at 78% 82%, rgba(0, 255, 136, .09), transparent 18%),
     var(--void);
   color: var(--bone);
-  font-family: "Courier New", monospace;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   image-rendering: pixelated;
   letter-spacing: 0;
 }
@@ -59,12 +59,12 @@ body {
 
 canvas {
   display: block;
-  image-rendering: pixelated;
 }
 
 #game {
   width: 100%;
   height: 100%;
+  image-rendering: pixelated;
 }
 
 #hud {
@@ -142,6 +142,28 @@ canvas {
   line-height: 1.25;
   border-top: 1px solid rgba(232, 224, 208, .16);
   padding-top: 7px;
+}
+
+#pauseBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 84px;
+  height: 34px;
+  border: 2px solid var(--gold);
+  background: linear-gradient(180deg, rgba(39, 19, 52, .94), rgba(8, 7, 12, .94));
+  color: var(--bone);
+  font: 700 12px "Segoe UI", Tahoma, Arial, sans-serif;
+  text-shadow: 2px 2px #000;
+  box-shadow: 0 0 0 2px #000 inset, 0 8px 22px rgba(0, 0, 0, .36);
+  cursor: pointer;
+  z-index: 6;
+}
+
+#pauseBtn:hover,
+#pauseBtn[aria-pressed="true"] {
+  color: var(--green);
+  border-color: var(--green);
 }
 
 #inventory {
@@ -244,6 +266,7 @@ canvas {
 
 #death,
 #win,
+#pauseOverlay,
 .choiceOverlay {
   position: absolute;
   inset: 0;
@@ -257,6 +280,7 @@ canvas {
 
 #death.show,
 #win.show,
+#pauseOverlay.show,
 .choiceOverlay.show { display: grid; }
 
 .endBox {
@@ -287,7 +311,7 @@ canvas {
   border: 2px solid var(--gold);
   background: linear-gradient(180deg, #271334, #08070c);
   color: var(--bone);
-  font: 700 12px "Courier New", monospace;
+  font: 700 12px "Segoe UI", Tahoma, Arial, sans-serif;
   cursor: pointer;
   box-shadow: inset 0 0 0 2px #000;
 }
@@ -306,7 +330,7 @@ canvas {
   min-width: 0;
   height: 100vh;
   display: grid;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 1.7fr .9fr .75fr;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, .035), transparent 12px),
     var(--panel);
@@ -319,22 +343,32 @@ canvas {
   border-bottom: 2px solid #2f2240;
   padding: 10px;
   display: grid;
-  grid-template-rows: auto minmax(116px, 1fr) auto;
+  grid-template-rows: auto minmax(230px, 1fr) auto;
   gap: 7px;
+}
+
+#buildSection {
+  grid-template-rows: auto minmax(300px, 1fr);
+}
+
+#buildSection #adjList {
+  display: none;
 }
 
 .section h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gold);
   text-transform: uppercase;
   text-shadow: 0 0 8px rgba(255, 215, 0, .22);
+  font-weight: 800;
 }
 
 .section canvas {
   width: 100%;
   height: 100%;
-  min-height: 116px;
+  min-height: 230px;
+  image-rendering: auto;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 18px 18px,
     linear-gradient(0deg, rgba(255, 255, 255, .02) 1px, transparent 1px) 0 0 / 18px 18px,
@@ -347,10 +381,11 @@ pre {
   margin: 0;
   white-space: pre-wrap;
   overflow: auto;
-  max-height: 86px;
+  max-height: 118px;
   color: var(--green);
-  font-size: 11px;
-  line-height: 1.25;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
 }
 
 #log {
@@ -359,7 +394,8 @@ pre {
   border: 1px solid #25512f;
   padding: 8px;
   color: var(--green);
-  font-size: 11px;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 12px;
   line-height: 1.35;
   min-height: 0;
   grid-row: 2 / 4;
