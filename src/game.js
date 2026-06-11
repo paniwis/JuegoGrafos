@@ -254,6 +254,7 @@ const levels = [
     sky: ['#c9dee0', '#7fa6a8', '#26444f', '#071014'],
     accent: '#9fd968',
     music: 'assets/level1-music.mp3',
+    bossMusic: 'assets/level1-boss-music.mp3',
   },
   {
     name: 'Templo de Niebla',
@@ -449,11 +450,13 @@ let dialogIndex = 0;
 let dialogCallback = null;
 let pendingBossDrops = null;
 let bossCombatTimer = 0;
-const bgMusic = document.getElementById('bgMusic');
+const defaultMusicVolume = 0.22;
 let musicOn = false;
+let musicFadeHandle = null;
+const bgMusic = document.getElementById('bgMusic');
 if (bgMusic) {
   bgMusic.src = 'assets/ambient-loop.mp3';
-  bgMusic.volume = 0.22;
+  bgMusic.volume = defaultMusicVolume;
   bgMusic.loop = true;
 }
 const bossSpecialAttacks = [];
@@ -990,6 +993,7 @@ function spawnBoss() {
     isCharging: false,
   };
   levelState = 'boss';
+  if (level.bossMusic) playLevelMusic(level, 'boss');
   log(`JEFE DEL NIVEL ${wave}: ${level.bossName} entra. BFS activo.`);
   const bossDialogue = bossDialogues[wave]?.pre;
   if (bossDialogue && bossDialogue.length) {
@@ -1254,13 +1258,61 @@ function toggleMusic() {
   }
 }
 
-function playLevelMusic(level) {
-  if (!bgMusic || !level.music) return;
-  bgMusic.src = level.music;
-  bgMusic.currentTime = 0;
-  if (musicOn) {
-    bgMusic.play().catch(() => {});
+function playLevelMusic(level, stage = 'minions') {
+  if (!bgMusic || !level) return;
+  const source = stage === 'boss' && level.bossMusic ? level.bossMusic : level.music;
+  if (!source) return;
+  setMusicSource(source);
+}
+
+function setMusicSource(source) {
+  if (!bgMusic || !source) return;
+  if (bgMusic.src && bgMusic.src.includes(source)) return;
+  if (!musicOn) {
+    bgMusic.src = source;
+    bgMusic.currentTime = 0;
+    return;
   }
+
+  if (musicFadeHandle) cancelAnimationFrame(musicFadeHandle);
+  const fadeOutDuration = 240;
+  const fadeInDuration = 240;
+  const startingVolume = bgMusic.volume;
+  let stage = 'fadeout';
+  let startTime = performance.now();
+
+  function step(now) {
+    if (stage === 'fadeout') {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / fadeOutDuration);
+      bgMusic.volume = startingVolume * (1 - progress);
+      if (progress < 1) {
+        musicFadeHandle = requestAnimationFrame(step);
+        return;
+      }
+      bgMusic.pause();
+      bgMusic.src = source;
+      bgMusic.currentTime = 0;
+      bgMusic.volume = 0;
+      bgMusic.play().catch(() => {});
+      stage = 'fadein';
+      startTime = performance.now();
+      musicFadeHandle = requestAnimationFrame(step);
+      return;
+    }
+
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / fadeInDuration);
+    bgMusic.volume = defaultMusicVolume * progress;
+    if (progress < 1) {
+      musicFadeHandle = requestAnimationFrame(step);
+    } else {
+      bgMusic.volume = defaultMusicVolume;
+      musicFadeHandle = null;
+    }
+  }
+
+  musicFadeHandle = requestAnimationFrame(step);
 }
 
 function advanceLevelAfterReward() {
@@ -1341,8 +1393,8 @@ function updateBoss(dt) {
     }
   }
 
-  // Sistema de ataque especial cada 40 segundos
-  if (boss.specialAttackTimer >= 40) {
+  // Sistema de ataque especial cada 10 segundos
+  if (boss.specialAttackTimer >= 10) {
     boss.specialAttackTimer = 0;
     boss.specialAttackPhase = 0;
     boss.isCharging = true;

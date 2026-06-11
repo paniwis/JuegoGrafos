@@ -11,19 +11,7 @@ de la rana ronin como fallback.
 
 ================================================================================
 
-🎵 CONFIGURACIÓN DE MÚSICA (NECROFORGE)
+🎵 NOTA DE MÚSICA
 
-Descarga 4 archivos MP3 y colócalos aquí con estos nombres EXACTOS:
-
-  level1-music.mp3   ← Bosque Hundido (Garven)
-  level2-music.mp3   ← Templo de Niebla (Brakka)
-  level3-music.mp3   ← Forja Sangrienta (Lyra)
-  level4-music.mp3   ← Trono del Vacío (Auren)
-
-Sitios recomendados (GRATIS):
-  • https://pixabay.com/music/
-  • https://incompetech.com/music/
-  • https://opengameart.org/
-
-Para una guía completa visual, abre: descargar-musica.html
-Para instrucciones detalladas, abre: SETUP-MUSICA.md
+Coloca tus archivos MP3 de audio en la carpeta `assets/`.
+Asegúrate de usar los nombres que espera el juego si quieres que la música cambie entre niveles.
