@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NECROFORGE - Prueba de Diálogos</title>
+    <style>
+      :root {
+        --void: #0a0a0f;
+        --gold: #ffd700;
+        --bone: #e8e0d0;
+        --green: #00ff88;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1a0a2e, #16213e);
+        color: var(--bone);
+        font-family: 'Segoe UI', Arial, sans-serif;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: var(--gold);
+        margin-bottom: 30px;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.45);
+      }
+
+      .dialog-box {
+        background: linear-gradient(180deg, rgba(26, 10, 46, 0.98), rgba(6, 5, 10, 0.98));
+        border: 2px solid var(--gold);
+        padding: 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+      }
+
+      .boss-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+
+      button {
+        padding: 12px;
+        border: 2px solid var(--green);
+        background: linear-gradient(180deg, rgba(39, 19, 52, 0.94), rgba(8, 7, 12, 0.94));
+        color: var(--bone);
+        cursor: pointer;
+        font-weight: bold;
+        text-shadow: 2px 2px #000;
+        transition: all 0.3s;
+      }
+
+      button:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+
+      button.active {
+        border-color: var(--gold);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .dialog-content {
+        min-height: 200px;
+        margin-bottom: 20px;
+      }
+
+      .dialog-line {
+        margin-bottom: 15px;
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      .speaker {
+        display: block;
+        font-weight: bold;
+        color: var(--gold);
+        margin-bottom: 4px;
+      }
+
+      .text {
+        color: #e8e0d0;
+        line-height: 1.5;
+      }
+
+      .progress {
+        color: var(--green);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .boss-info {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-left: 3px solid var(--green);
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎮 NECROFORGE - Prueba de Narrativa</h1>
+
+      <div class="boss-info" id="bossInfo" style="display: none">
+        <strong id="bossName"></strong>
+        <p id="bossDesc" style="margin-top: 8px; font-size: 12px"></p>
+      </div>
+
+      <div class="boss-selector" id="bossButtons"></div>
+
+      <div class="controls">
+        <button onclick="selectDialogType('pre')">Diálogo Pre-Combate</button>
+        <button onclick="selectDialogType('combat')">Diálogos de Combate</button>
+        <button onclick="selectDialogType('defeat')">Diálogo Post-Derrota</button>
+        <button onclick="resetDialog()">Reiniciar</button>
+      </div>
+
+      <div class="dialog-box">
+        <div class="dialog-content" id="dialogContent"></div>
+        <div class="progress" id="progress"></div>
+        <button onclick="nextDialog()" style="width: 100%; margin-top: 20px">Siguiente → (o presiona ESPACIO)</button>
+      </div>
+    </div>
+
+    <script>
+      // Datos de diálogos desde el juego
+      const bossData = [
+        {
+          index: 1,
+          name: 'Garven',
+          title: 'el Guardián de los Brazos de Raíz',
+          level: 'Bosque Hundido',
+        },
+        {
+          index: 2,
+          name: 'Brakka',
+          title: 'la Bestia de Hierro',
+          level: 'La Mina de Ceniza',
+        },
+        {
+          index: 3,
+          name: 'Lyra',
+          title: 'la Dama del Rostro Fragmentado',
+          level: 'La Torre del Eco',
+        },
+        {
+          index: 4,
+          name: 'Auren',
+          title: 'el Guardián del Pecho',
+          level: 'La Catedral del Núcleo',
+        },
+      ];
+
+      const bossDialogues = {
+        1: {
+          pre: [
+            { speaker: 'Garven', text: 'Así que por fin enviaron a su perro.' },
+            { speaker: 'Kael', text: 'No soy perro de nadie. Vine a terminar con tu corrupción.' },
+            {
+              speaker: 'Garven',
+              text: '¿Corrupción? Mira a tu alrededor. Este bosque no está muriendo por mí. Está muriendo por los que te dieron esa espada.',
+            },
+            { speaker: 'Kael', text: 'Mentira. El Consejo dijo que tú devoraste estas tierras.' },
+            { speaker: 'Garven', text: 'El Consejo también dijo que no recordarías nada, ¿verdad?' },
+            { speaker: 'Kael', text: 'Cállate.' },
+            { speaker: 'Garven', text: 'Entonces pelea. Pero cuando tomes mi fuerza, también tomarás mi memoria.' },
+          ],
+          defeat: [
+            { speaker: 'Garven', text: 'No sientes victoria… porque algo dentro de ti sabe que esto está mal.' },
+            { speaker: 'Kael', text: 'Dime qué sabes.' },
+            { speaker: 'Garven', text: 'No… lo verás.' },
+          ],
+          combat: ['No eres quién crees que eres.', 'La verdad está dentro de ti.', 'Recuerda quién fuiste.'],
+        },
+        2: {
+          pre: [
+            { speaker: 'Brakka', text: 'Vienes con el brazo de Garven. Entonces ya empezaste a recordar.' },
+            { speaker: 'Kael', text: 'Recuerdo mentiras. Visiones rotas.' },
+            { speaker: 'Brakka', text: 'Las memorias no mienten. Solo duelen.' },
+          ],
+          defeat: [
+            { speaker: 'Brakka', text: 'Toma mis piernas, cazador. Corre con ellas. Huye de la verdad.' },
+            { speaker: 'Kael', text: '¿Por qué todos dicen lo mismo?' },
+            { speaker: 'Brakka', text: 'Porque todos vimos tu rostro antes de morir.' },
+          ],
+          combat: ['¡Cada golpe tuyo suena igual!', 'No huyas de lo que eres.'],
+        },
+        3: {
+          pre: [
+            { speaker: 'Lyra', text: 'Has llegado más lejos de lo que esperaban.' },
+            { speaker: 'Kael', text: '¿Tú también vas a decirme que soy un monstruo?' },
+            { speaker: 'Lyra', text: 'No. Un monstruo elige. Tú fuiste vaciado.' },
+          ],
+          defeat: [
+            { speaker: 'Lyra', text: 'No te odio, Kael.' },
+            { speaker: 'Kael', text: 'Deberías.' },
+            { speaker: 'Lyra', text: 'Tal vez. Pero el odio fue la cadena que te pusieron. No seré yo quien la cierre.' },
+          ],
+          combat: [
+            'Cada parte que robas te acerca más a lo que ellos querían.',
+            '¡Yo decido quién soy!',
+            'Entonces empieza decidiendo no obedecer.',
+          ],
+        },
+        4: {
+          pre: [
+            { speaker: 'Auren', text: 'Llegaste, hermano.' },
+            { speaker: 'Kael', text: 'No me llames así.' },
+            { speaker: 'Auren', text: 'Eso eras antes de que te arrancaran los recuerdos.' },
+          ],
+          defeat: [
+            { speaker: 'Auren', text: 'Ahora… toma el último recuerdo.' },
+            { speaker: 'Kael', text: 'No quiero ver más.' },
+            { speaker: 'Auren', text: 'Tienes que hacerlo.' },
+          ],
+          combat: ['¡No eres el arma del Consejo!', '¡Ya no sé qué soy!', 'Lo sé. Por eso te usaron.'],
+        },
+      };
+
+      let currentBoss = null;
+      let currentType = 'pre';
+      let currentDialogs = [];
+      let currentIndex = 0;
+
+      function initBossButtons() {
+        const container = document.getElementById('bossButtons');
+        bossData.forEach(boss => {
+          const btn = document.createElement('button');
+          btn.textContent = boss.name;
+          btn.onclick = () => selectBoss(boss.index, btn);
+          container.appendChild(btn);
+        });
+      }
+
+      function selectBoss(index, btn) {
+        currentBoss = bossData.find(b => b.index === index);
+        currentIndex = 0;
+
+        // Actualizar activo
+        document.querySelectorAll('.boss-selector button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Mostrar info
+        const info = document.getElementById('bossInfo');
+        document.getElementById('bossName').textContent = `${currentBoss.name} - ${currentBoss.title}`;
+        document.getElementById('bossDesc').textContent = currentBoss.level;
+        info.style.display = 'block';
+
+        selectDialogType('pre');
+      }
+
+      function selectDialogType(type) {
+        currentType = type;
+        currentIndex = 0;
+        if (currentBoss) {
+          currentDialogs = bossDialogues[currentBoss.index][type] || [];
+          displayDialog();
+        }
+      }
+
+      function nextDialog() {
+        currentIndex++;
+        displayDialog();
+      }
+
+      function displayDialog() {
+        const content = document.getElementById('dialogContent');
+        const progress = document.getElementById('progress');
+
+        if (currentIndex >= currentDialogs.length) {
+          content.innerHTML = "<p style='color: #666;'>✓ Fin del diálogo. Selecciona otra sección.</p>";
+          progress.textContent = 'Finalizado';
+          return;
+        }
+
+        const line = currentDialogs[currentIndex];
+        if (typeof line === 'string') {
+          content.innerHTML = `<div class="dialog-line"><span class="speaker">[Sistema]</span><p class="text">${line}</p></div>`;
+        } else {
+          content.innerHTML = `<div class="dialog-line"><span class="speaker">${line.speaker}</span><p class="text">${line.text}</p></div>`;
+        }
+
+        progress.textContent = `${currentIndex + 1} / ${currentDialogs.length}`;
+      }
+
+      function resetDialog() {
+        currentIndex = 0;
+        displayDialog();
+      }
+
+      // Event listeners
+      document.addEventListener('keydown', e => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          nextDialog();
+        }
+      });
+
+      // Inicializar
+      window.addEventListener('load', () => {
+        initBossButtons();
+        selectBoss(1, document.querySelector('.boss-selector button'));
+      });
+    </script>
+  </body>
+</html>

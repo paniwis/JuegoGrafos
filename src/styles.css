@@ -12,7 +12,9 @@
   --ink: #040407;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html,
 body {
@@ -21,11 +23,10 @@ body {
   margin: 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 12% 16%, rgba(139, 0, 0, .18), transparent 20%),
-    radial-gradient(circle at 78% 82%, rgba(0, 255, 136, .09), transparent 18%),
-    var(--void);
+    radial-gradient(circle at 12% 16%, rgba(139, 0, 0, 0.18), transparent 20%),
+    radial-gradient(circle at 78% 82%, rgba(0, 255, 136, 0.09), transparent 18%), var(--void);
   color: var(--bone);
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   image-rendering: pixelated;
   letter-spacing: 0;
 }
@@ -39,21 +40,21 @@ body {
   position: relative;
   min-width: 0;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 32px 32px,
-    linear-gradient(0deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(0deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 32px 32px,
     radial-gradient(circle at 48% 35%, #261045 0, #100819 48%, #050508 100%);
   border-right: 2px solid #4c315f;
-  box-shadow: inset -24px 0 54px rgba(0, 0, 0, .45);
+  box-shadow: inset -24px 0 54px rgba(0, 0, 0, 0.45);
 }
 
 #gameWrap::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(to bottom, rgba(255, 215, 0, .07), transparent 90px),
-    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, .48) 100%);
+    linear-gradient(to bottom, rgba(255, 215, 0, 0.07), transparent 90px),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.48) 100%);
   mix-blend-mode: screen;
 }
 
@@ -75,9 +76,12 @@ canvas {
   padding: 12px 14px;
   color: var(--bone);
   text-shadow: 2px 2px #000;
-  background: linear-gradient(180deg, rgba(20, 10, 35, .88), rgba(5, 5, 8, .82));
+  background: linear-gradient(180deg, rgba(20, 10, 35, 0.88), rgba(5, 5, 8, 0.82));
   border: 2px solid #765a88;
-  box-shadow: 0 0 0 2px #050508 inset, 0 10px 32px rgba(0, 0, 0, .45), 0 0 18px rgba(0, 255, 136, .08);
+  box-shadow:
+    0 0 0 2px #050508 inset,
+    0 10px 32px rgba(0, 0, 0, 0.45),
+    0 0 18px rgba(0, 255, 136, 0.08);
   pointer-events: none;
   z-index: 2;
 }
@@ -87,7 +91,9 @@ canvas {
   color: var(--gold);
   font-size: 25px;
   line-height: 1;
-  text-shadow: 0 0 8px rgba(255, 215, 0, .45), 3px 3px #000;
+  text-shadow:
+    0 0 8px rgba(255, 215, 0, 0.45),
+    3px 3px #000;
 }
 
 .hpMeter {
@@ -104,7 +110,7 @@ canvas {
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, #8b0000, #00ff88);
-  transition: width .12s linear;
+  transition: width 0.12s linear;
 }
 
 #hpText {
@@ -125,13 +131,15 @@ canvas {
   font-size: 11px;
 }
 
-.hudRow + .hudRow { margin-top: 6px; }
+.hudRow + .hudRow {
+  margin-top: 6px;
+}
 
 .hudRow span {
   white-space: nowrap;
   color: var(--green);
-  background: rgba(0, 0, 0, .28);
-  border-left: 2px solid rgba(0, 255, 136, .35);
+  background: rgba(0, 0, 0, 0.28);
+  border-left: 2px solid rgba(0, 255, 136, 0.35);
   padding: 3px 5px;
 }
 
@@ -140,28 +148,43 @@ canvas {
   color: #f2d7d7;
   font-size: 12px;
   line-height: 1.25;
-  border-top: 1px solid rgba(232, 224, 208, .16);
+  border-top: 1px solid rgba(232, 224, 208, 0.16);
   padding-top: 7px;
 }
 
-#pauseBtn {
+#pauseBtn,
+#musicBtn {
   position: absolute;
   top: 12px;
-  right: 12px;
   min-width: 84px;
   height: 34px;
   border: 2px solid var(--gold);
-  background: linear-gradient(180deg, rgba(39, 19, 52, .94), rgba(8, 7, 12, .94));
+  background: linear-gradient(180deg, rgba(39, 19, 52, 0.94), rgba(8, 7, 12, 0.94));
   color: var(--bone);
-  font: 700 12px "Segoe UI", Tahoma, Arial, sans-serif;
+  font:
+    700 12px 'Segoe UI',
+    Tahoma,
+    Arial,
+    sans-serif;
   text-shadow: 2px 2px #000;
-  box-shadow: 0 0 0 2px #000 inset, 0 8px 22px rgba(0, 0, 0, .36);
+  box-shadow:
+    0 0 0 2px #000 inset,
+    0 8px 22px rgba(0, 0, 0, 0.36);
   cursor: pointer;
   z-index: 6;
 }
 
+#pauseBtn {
+  right: 12px;
+}
+#musicBtn {
+  right: 108px;
+}
+
 #pauseBtn:hover,
-#pauseBtn[aria-pressed="true"] {
+#pauseBtn[aria-pressed='true'],
+#musicBtn:hover,
+#musicBtn[aria-pressed='true'] {
   color: var(--green);
   border-color: var(--green);
 }
@@ -178,14 +201,19 @@ canvas {
   gap: 12px;
   padding: 14px;
   background:
-    linear-gradient(180deg, rgba(26, 10, 46, .98), rgba(6, 5, 10, .98)),
-    repeating-linear-gradient(0deg, transparent 0 10px, rgba(255, 255, 255, .02) 10px 12px);
+    linear-gradient(180deg, rgba(26, 10, 46, 0.98), rgba(6, 5, 10, 0.98)),
+    repeating-linear-gradient(0deg, transparent 0 10px, rgba(255, 255, 255, 0.02) 10px 12px);
   border: 2px solid var(--gold);
-  box-shadow: 0 0 0 4px #000 inset, 0 18px 70px rgba(0, 0, 0, .72), 0 0 36px rgba(255, 215, 0, .12);
+  box-shadow:
+    0 0 0 4px #000 inset,
+    0 18px 70px rgba(0, 0, 0, 0.72),
+    0 0 36px rgba(255, 215, 0, 0.12);
   z-index: 4;
 }
 
-#inventory.open { display: grid; }
+#inventory.open {
+  display: grid;
+}
 
 #inventory h2,
 #inventory h3 {
@@ -213,13 +241,15 @@ canvas {
   cursor: grab;
   user-select: none;
   font-size: 12px;
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .45);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45);
 }
 
 .part:hover {
   border-color: var(--green);
   color: #fff;
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .45), 0 0 14px rgba(0, 255, 136, .2);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.45),
+    0 0 14px rgba(0, 255, 136, 0.2);
 }
 
 .part strong {
@@ -251,7 +281,7 @@ canvas {
   border-style: solid;
   border-color: var(--green);
   background: linear-gradient(180deg, #092016, #04100b);
-  box-shadow: 0 0 12px rgba(0, 255, 136, .13);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.13);
 }
 
 .hint {
@@ -273,22 +303,44 @@ canvas {
   display: none;
   place-items: center;
   padding: 24px;
-  background: rgba(0, 0, 0, .84);
+  background: rgba(0, 0, 0, 0.84);
   z-index: 5;
   text-align: center;
+}
+
+#dialogOverlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: none;
+  padding: 16px 24px 24px;
+  background: rgba(0, 0, 0, 0.94);
+  z-index: 5;
+  text-align: left;
+  height: auto;
+  max-height: 35vh;
+  border-top: 2px solid var(--gold);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
 }
 
 #death.show,
 #win.show,
 #pauseOverlay.show,
-.choiceOverlay.show { display: grid; }
+.choiceOverlay.show {
+  display: grid;
+}
+
+#dialogOverlay.show {
+  display: block;
+}
 
 .endBox {
   width: min(600px, 96%);
   padding: 20px;
   border: 2px solid var(--bone);
   background: linear-gradient(180deg, #13091f, #050407);
-  box-shadow: 0 0 0 5px #000 inset, 0 0 38px rgba(139, 0, 0, .28);
+  box-shadow:
+    0 0 0 5px #000 inset,
+    0 0 38px rgba(139, 0, 0, 0.28);
 }
 
 .endBox h2 {
@@ -297,7 +349,37 @@ canvas {
   color: var(--red);
 }
 
-#win .endBox h2 { color: var(--gold); }
+#win .endBox h2 {
+  color: var(--gold);
+}
+
+.dialogText {
+  text-align: left;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+  padding-right: 4px;
+}
+
+.dialogText p {
+  margin: 0;
+  line-height: 1.35;
+  font-size: 13px;
+}
+
+.dialogSpeaker {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.dialogPrompt {
+  margin: 0;
+  color: var(--green);
+  font-size: 11px;
+}
 
 .choiceButtons {
   display: grid;
@@ -311,7 +393,11 @@ canvas {
   border: 2px solid var(--gold);
   background: linear-gradient(180deg, #271334, #08070c);
   color: var(--bone);
-  font: 700 12px "Segoe UI", Tahoma, Arial, sans-serif;
+  font:
+    700 12px 'Segoe UI',
+    Tahoma,
+    Arial,
+    sans-serif;
   cursor: pointer;
   box-shadow: inset 0 0 0 2px #000;
 }
@@ -330,12 +416,10 @@ canvas {
   min-width: 0;
   height: 100vh;
   display: grid;
-  grid-template-rows: 1.7fr .9fr .75fr;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, .035), transparent 12px),
-    var(--panel);
+  grid-template-rows: 1.7fr 0.9fr 0.75fr;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.035), transparent 12px), var(--panel);
   color: var(--bone);
-  box-shadow: inset 12px 0 26px rgba(0, 0, 0, .5);
+  box-shadow: inset 12px 0 26px rgba(0, 0, 0, 0.5);
 }
 
 .section {
@@ -360,7 +444,7 @@ canvas {
   font-size: 15px;
   color: var(--gold);
   text-transform: uppercase;
-  text-shadow: 0 0 8px rgba(255, 215, 0, .22);
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.22);
   font-weight: 800;
 }
 
@@ -370,11 +454,11 @@ canvas {
   min-height: 230px;
   image-rendering: auto;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 18px 18px,
-    linear-gradient(0deg, rgba(255, 255, 255, .02) 1px, transparent 1px) 0 0 / 18px 18px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 18px 18px,
+    linear-gradient(0deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 18px 18px,
     #040405;
   border: 1px solid #40314b;
-  box-shadow: inset 0 0 28px rgba(0, 0, 0, .55);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.55);
 }
 
 pre {
@@ -383,7 +467,7 @@ pre {
   overflow: auto;
   max-height: 118px;
   color: var(--green);
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   font-size: 12px;
   line-height: 1.3;
 }
@@ -394,15 +478,17 @@ pre {
   border: 1px solid #25512f;
   padding: 8px;
   color: var(--green);
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   font-size: 12px;
   line-height: 1.35;
   min-height: 0;
   grid-row: 2 / 4;
-  box-shadow: inset 0 0 22px rgba(0, 255, 136, .08);
+  box-shadow: inset 0 0 22px rgba(0, 255, 136, 0.08);
 }
 
-#log div { margin-bottom: 3px; }
+#log div {
+  margin-bottom: 3px;
+}
 
 @media (max-width: 960px) {
   body {
